@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Login</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/app.css">
+</head>
+
+<body>
+
+
+  <div class="container">
+
+
+    <form action="/auth/login" method="POST">
+      <% if (messages.error) { %>
+        <div class="message">
+          <%= messages.error %>
+        </div>
+        <% } %>
+          <p class="title">Welcome</p>
+          <input class="inputField" type="email" name="email" placeholder="Email"><br>
+          <input class="inputField" type="password" name="password" placeholder="Password"><br>
+          <input class="submit" type="submit" value="Sign in"><br>
+          <a href="/auth/register">Register</a>
+    </form>
+
+    <div class="drops">
+      <div class="drop drop-1"></div>
+      <div class="drop drop-2"></div>
+      <div class="drop drop-3"></div>
+      <div class="drop drop-4"></div>
+      <div class="drop drop-5"></div>
+    </div>
+  </div>
+
+</body>
+
+</html>
