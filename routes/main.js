@@ -1,17 +1,22 @@
 const express = require('express');
-//const { checkAuthenticated } = require('../helper/auth');
 const router = express.Router()
 
-router.get(
-    '/profile',
-    (req, res, next) => {
-      res.json({
-        message: 'You made it to the secure route',
-        user: req.user,
-        token: req.query.secret_token
-      })
-    }
-  );
+router.get('/',(req,res) => {
+  console.log('home')
+  res.render("index")
+})
+
+
+// router.get(
+//     '/profile',
+//     (req, res, next) => {
+//       res.json({
+//         message: 'You made it to the secure route',
+//         user: req.user,
+//         token: req.query.secret_token
+//       })
+//     }
+//   );
 
 
 

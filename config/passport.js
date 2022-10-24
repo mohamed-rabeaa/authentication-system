@@ -1,13 +1,12 @@
 const User = require('../models/User')
 const passport = require('passport');
-
-
 const localStrategy = require('passport-local').Strategy;
-// ...
-
+const facebookStrategy = require('passport-facebook').Strategy
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 
+/*
 passport.use(
   'signup',
   new localStrategy(
@@ -17,13 +16,10 @@ passport.use(
     },
     async (email, password, done) => {
       try {
-        console.log(1)
-        console.log("frist",email, password)
-        //console.log(req.body.email, req.body.password)
         const user = await new User({
-                  email,
-                  password
-                }).save()
+          email,
+          password
+        }).save()
         console.log(2)
 
         return done(null, user);
@@ -33,8 +29,6 @@ passport.use(
     }
   )
 );
-
-// ...
 
 passport.use(
   'login',
@@ -80,33 +74,129 @@ passport.use(
     }
   )
 );
+*/
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_ID;
 
-/* 
-function initialize(passport) {
-  const authenticateUser = async (email, password, done) => {
-   
-    const user = await User.findOne({email})
-    
-    if (!user) {
-      return done(null, false, { message: 'No user with that email' })
-    }
+GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_ID;
 
-    try {
-      if (await bcrypt.compare(password, user.password)) {
-        return done(null, user)
-      } else {
-        return done(null, false, { message: 'Password incorrect' })
-      }
-    } catch (error) {
-      return done(error)
-    }
-  }
+const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
+const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
 
-  passport.use(new LocalStrategy({ usernameField: 'email' }, authenticateUser))
-  passport.serializeUser((user, done) => done(null, user.id))
-  passport.deserializeUser(async(id, done) => {
-    const user = await User.findById(id)
-    return done(null, user)
+
+passport.use(new facebookStrategy({
+
+  clientID        : FACEBOOK_CLIENT_ID,
+  clientSecret    :  FACEBOOK_CLIENT_SECRET,
+  callbackURL     : "http://localhost:5000/auth/facebook/callback",
+  profileFields: ['id', 'displayName', 'name', 'gender', 'picture.type(large)','email']
+
+},// facebook will send back the token and profile
+function(token, refreshToken, profile, done) {
+
+  // asynchronous
+  process.nextTick(function() {
+
+      // find the user in the database based on their facebook id
+      User.findOne({ 'userid' : profile.id }, function(err, user) {
+
+          // if there is an error, stop everything and return that
+          // ie an error connecting to the database
+          if (err)
+              return done(err);
+
+          // if the user is found, then log them in
+          if (user) {
+              console.log("user found")
+              console.log(user)
+              return done(null, user); // user found, return that user
+          } else {
+            console.log(profile)
+              // if there is no user found with that facebook id, create them
+              var newUser = new User();
+
+              // set all of the facebook information in our user model
+              newUser.userid = profile.id; // set the users facebook id                   
+              newUser.token = token; // we will save the token that facebook provides to the user                    
+              newUser.name  = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
+              //newUser.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+              newUser.gender = profile.gender
+              newUser.avatar = profile.photos[0].value
+              // save our user to the database
+              newUser.save(function(err) {
+                  if (err)
+                      throw err;
+
+                  // if successful, return the new user
+                  return done(null, newUser);
+              });
+          }
+
+      });
+
   })
-} 
+
+}));
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+// used to deserialize the user
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+      done(err, user);
+  });
+});
+
+
+/*
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "/auth/google/callback",
+    },
+    function (accessToken, refreshToken, profile, done) {
+      done(null, profile);
+    }
+  )
+);
+
+passport.use(
+  new GithubStrategy(
+    {
+      clientID: GITHUB_CLIENT_ID,
+      clientSecret: GITHUB_CLIENT_SECRET,
+      callbackURL: "/auth/github/callback",
+    },
+    function (accessToken, refreshToken, profile, done) {
+      done(null, profile);
+    }
+  )
+);
+
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: FACEBOOK_APP_ID,
+      clientSecret: FACEBOOK_APP_SECRET,
+      callbackURL: "/auth/facebook/callback",
+    },
+    function (accessToken, refreshToken, profile, done) {
+      done(null, profile);
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
 */

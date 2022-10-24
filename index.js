@@ -4,16 +4,11 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
+const session = require('express-session')
 const passport = require('passport')
 const User = require('./models/User')
-// const cors = require('cors')
-// const flash = require('express-flash')
-// const session = require('express-session')
-// const methodOverride = require('method-override')
 const authRoutes = require("./routes/auth");
 const mainRoutes = require("./routes/main");
-
-
 
 const app = express()
 
@@ -28,30 +23,25 @@ mongoose.connect(process.env.MONGO_URL, {
 });
 
 require('./config/passport')
-//initializePassport(passport)
-
-//app.set('view-engine', 'ejs')
+app.set("view engine","ejs")
 app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(express.static(path.join(`${__dirname}/puplic`)));
+app.use(express.static(__dirname + '/views'));
 
-// app.use(express.urlencoded({ extended: false }))
-// app.use(express.static(__dirname + '/public'));
-// app.use(flash())
-// app.use(session({
-//   secret: process.env.SESSION_SECRET,
-//   resave: false,
-//   saveUninitialized: false
-// }))
-app.use(passport.initialize())
-// app.use(passport.session())
-// app.use(methodOverride('_method'))
+app.use(session({ secret: 'ilovescotchscotchyscotchscotch' }));
+app.use(passport.initialize());
+app.use(passport.session()); 
+
 
 app.use("/auth", authRoutes);
-app.use("/",passport.authenticate('jwt', { session: false }), mainRoutes);
+app.use("/", mainRoutes);
 
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.json({ error: err });
-});
+// app.use("/",passport.authenticate('jwt', { session: false }), mainRoutes);
+
+// app.use(function(err, req, res, next) {
+//   res.status(err.status || 500);
+//   res.json({ error: err });
+// });
 
 app.listen(process.env.PORT || 5000 , () => {
   console.log(`Server running on port 5001`);
