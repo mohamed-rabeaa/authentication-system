@@ -36,6 +36,13 @@ router.get('/google/callback',
     successRedirect : '/auth/profile',
     failureRedirect : '/'
   }));
+router.get('/githubLogin', passport.authenticate('github', { scope : 'profile' }));
+
+router.get('/github/callback',
+  passport.authenticate('github', {
+    successRedirect : '/auth/profile',
+    failureRedirect : '/'
+  }));
 
 
 

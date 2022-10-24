@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
     token: String,
     name: String,
     gender: String,
-    avatar: String
+    avatar: String,
+    provider: String
 },
   {timestamps: true}
 );
