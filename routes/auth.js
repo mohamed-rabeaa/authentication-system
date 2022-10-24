@@ -22,10 +22,17 @@ router.get('/logout', function(req, res) {
 
 
 
-router.get('/facebookLogin', passport.authenticate('facebook', { scope : 'email' }));
+router.get('/facebookLogin', passport.authenticate('facebook', { scope : 'profile' }));
 
 router.get('/facebook/callback',
   passport.authenticate('facebook', {
+    successRedirect : '/auth/profile',
+    failureRedirect : '/'
+  }));
+router.get('/googleLogin', passport.authenticate('google', { scope : 'profile' }));
+
+router.get('/google/callback',
+  passport.authenticate('google', {
     successRedirect : '/auth/profile',
     failureRedirect : '/'
   }));

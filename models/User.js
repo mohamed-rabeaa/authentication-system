@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt')
 const UserSchema = new mongoose.Schema({
     userid: String,
     token: String,
-    email: String,
     name: String,
     gender: String,
     avatar: String
@@ -30,6 +29,6 @@ const UserSchema = new mongoose.Schema({
 
 //   return compare;
 // }
-
+ 
 
 module.exports = mongoose.model("User", UserSchema);
