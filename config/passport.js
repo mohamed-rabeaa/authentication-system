@@ -7,7 +7,16 @@ const GithubStrategy = require("passport-github2").Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 
-/*
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+
+const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
+const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
+
+
 passport.use(
   'signup',
   new localStrategy(
@@ -75,15 +84,6 @@ passport.use(
     }
   )
 );
-*/
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-
-const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
-const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
 
 passport.use(
   new GoogleStrategy(
@@ -94,34 +94,28 @@ passport.use(
     },
     function(token, refreshToken, profile, done) {
 
-      // asynchronous
       process.nextTick(function() {
     
-          // find the user in the database based on their facebook id
           User.findOne({ 'userid' : profile.id }, function(err, user) {
     
-              // if there is an error, stop everything and return that
-              // ie an error connecting to the database
               if (err)
                   return done(err);
     
-              // if the user is found, then log them in
               if (user) {
                   console.log("user found")
                   console.log(user)
-                  return done(null, user); // user found, return that user
+                  return done(null, user); 
               } else {
                 console.log(profile)
-                  // if there is no user found with that facebook id, create them
-                  var newUser = new User();
+
+                var newUser = new User();
     
-                  // set all of the facebook information in our user model
-                  newUser.userid = profile.id; // set the users facebook id                   
-                  newUser.token = token; // we will save the token that facebook provides to the user                    
-                  newUser.name  = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
+                  newUser.userid = profile.id;         
+                  newUser.token = token;              
+                  newUser.name  = profile.name.givenName + ' ' + profile.name.familyName; 
                   newUser.gender = profile.gender
                   newUser.avatar = profile.photos[0].value
-                  // save our user to the database
+
                   newUser.save(function(err) {
                       if (err)
                           throw err;
@@ -139,50 +133,44 @@ passport.use(
   )
 );
 
-passport.use(new facebookStrategy({
+passport.use(
+  new facebookStrategy({
 
   clientID        : FACEBOOK_CLIENT_ID,
   clientSecret    :  FACEBOOK_CLIENT_SECRET,
   callbackURL     : "http://localhost:5000/auth/facebook/callback",
   profileFields: ['id', 'displayName', 'name', 'gender', 'picture.type(large)','email']
 
-},// facebook will send back the token and profile
+},
 function(token, refreshToken, profile, done) {
 
   // asynchronous
   process.nextTick(function() {
 
-      // find the user in the database based on their facebook id
       User.findOne({ 'userid' : profile.id }, function(err, user) {
 
-          // if there is an error, stop everything and return that
-          // ie an error connecting to the database
           if (err)
               return done(err);
 
-          // if the user is found, then log them in
           if (user) {
               console.log("user found")
               console.log(user)
-              return done(null, user); // user found, return that user
+              return done(null, user); 
           } else {
             console.log(profile)
-              // if there is no user found with that facebook id, create them
-              var newUser = new User();
 
-              // set all of the facebook information in our user model
-              newUser.userid = profile.id; // set the users facebook id                   
-              newUser.token = token; // we will save the token that facebook provides to the user                    
-              newUser.name  = profile.name.givenName + ' ' + profile.name.familyName; // look at the passport user profile to see how names are returned
-              //newUser.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+            var newUser = new User();
+
+              newUser.userid = profile.id;            
+              newUser.token = token;           
+              newUser.name  = profile.name.givenName + ' ' + profile.name.familyName;
               newUser.gender = profile.gender
               newUser.avatar = profile.photos[0].value
-              // save our user to the database
+
               newUser.save(function(err) {
                   if (err)
                       throw err;
 
-                  // if successful, return the new user
                   return done(null, newUser);
               });
           }
@@ -205,37 +193,32 @@ passport.use(
       // asynchronous
       process.nextTick(function() {
     
-          // find the user in the database based on their facebook id
           User.findOne({ 'userid' : profile.id }, function(err, user) {
-    
-              // if there is an error, stop everything and return that
-              // ie an error connecting to the database
+
               if (err)
                   return done(err);
     
-              // if the user is found, then log them in
               if (user) {
                   console.log("user found")
                   console.log(user)
-                  return done(null, user); // user found, return that user
+                  return done(null, user);
               } else {
                 console.log(profile)
-                  // if there is no user found with that facebook id, create them
-                  var newUser = new User();
+
+                var newUser = new User();
     
                   // set all of the facebook information in our user model
-                  newUser.userid = profile.id; // set the users facebook id                   
-                  newUser.token = token; // we will save the token that facebook provides to the user                    
-                  newUser.name  = profile.username; // look at the passport user profile to see how names are returned
+                  newUser.userid = profile.id;                  
+                  newUser.token = token;                 
+                  newUser.name  = profile.username; 
                   newUser.gender = profile.gender
                   newUser.avatar = profile.photos[0].value
                   newUser.provider = profile.provider
-                  // save our user to the database
+                 
                   newUser.save(function(err) {
                       if (err)
                           throw err;
     
-                      // if successful, return the new user
                       return done(null, newUser);
                   });
               }
@@ -258,43 +241,3 @@ passport.deserializeUser(function(id, done) {
       done(err, user);
   });
 });
-
-
-
-
-/*
-passport.use(
-  new GithubStrategy(
-    {
-      clientID: GITHUB_CLIENT_ID,
-      clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: "/auth/github/callback",
-    },
-    function (accessToken, refreshToken, profile, done) {
-      done(null, profile);
-    }
-  )
-);
-
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: FACEBOOK_APP_ID,
-      clientSecret: FACEBOOK_APP_SECRET,
-      callbackURL: "/auth/facebook/callback",
-    },
-    function (accessToken, refreshToken, profile, done) {
-      done(null, profile);
-    }
-  )
-);
-
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
-
-*/
