@@ -1,18 +1,14 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import Container from '../../component/client/Container'
-import Navbar from '../../component/client/Navbar'
-import Footer from '../../component/wideget/Footer'
+import Container from '../component/Container'
 
 
 const Layout = () => {
   return (
     <>
-      <Navbar />
       <Container>
         <Outlet />
       </Container>
-      <Footer />
     </>
   )
 }
